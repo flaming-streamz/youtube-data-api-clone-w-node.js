@@ -19,13 +19,17 @@ export default function makeCommentsDb({ database }: { database: DatabaseModelsT
 
   async function findByHash() {}
 
-  async function findById() {}
+  async function findById({ id }: { id: ResourceObjectId }) {
+    const result = await commentsModel.findById(id);
+    return result;
+  }
 
   async function findByVideoId({ videoId, omitReplies = true }: { videoId: ResourceObjectId; omitReplies: boolean }) {
     const query: mongoose.FilterQuery<Comment> = { videoId };
     const result = await commentsModel.find({ ...query });
+
+    // TODO: make this efficent
     if (!omitReplies) {
-      // TODO: make this efficent
       const resultWithReplies = await Promise.all(
         result.map(async (item) => {
           const comments = await commentsModel.find({ parentId: item._id });
@@ -54,8 +58,14 @@ export default function makeCommentsDb({ database }: { database: DatabaseModelsT
     return result;
   }
 
-  async function insert() {}
-  async function update() {}
+  async function insert(comment: Comment) {
+    const result = await commentsModel.create({ ...comment });
+    return result;
+  }
+
+  async function update(id: string, commentUpdate: Partial<Comment>) {
+    await commentsModel.updateOne({ _id: id }, { $set: { ...commentUpdate } });
+  }
 
   async function remove({ id: _id }: { id: ResourceObjectId }) {
     const result = await commentsModel.deleteOne({ _id });
