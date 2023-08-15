@@ -1,9 +1,8 @@
 import commentService from "../use-cases";
-import logger from "@/utils/logger";
 
 import makeDeleteComment from "./delete-comment";
 
-const deleteComment = makeDeleteComment({ removeComment: commentService.removeComment, logger: logger });
+const deleteComment = makeDeleteComment({ removeComment: commentService.removeComment });
 
 const commentsController = Object.freeze({
   deleteComment,

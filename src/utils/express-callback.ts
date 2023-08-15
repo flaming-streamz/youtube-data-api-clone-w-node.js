@@ -1,6 +1,4 @@
 import express from "express";
-import { StatusCodes } from "http-status-codes";
-import logger from "./logger";
 
 export interface HTTPRequest<ParamsDictionary = any, RequestBody = {}, QueryDictionary = any> {
   body: RequestBody;
@@ -18,10 +16,10 @@ interface HTTPResponse {
   statusCode: number;
 }
 
-type ControllerHandler = (httpRequest: HTTPRequest) => Promise<HTTPResponse>;
+type ControllerHandler = (httpRequest: HTTPRequest, next?: express.NextFunction) => Promise<HTTPResponse>;
 
 export default function makeExpressCallback(controllerCallback: ControllerHandler) {
-  return (request: express.Request, response: express.Response) => {
+  return (request: express.Request, response: express.Response, next: express.NextFunction) => {
     const httpRequest = {
       body: request.body,
       query: request.query,
@@ -45,8 +43,7 @@ export default function makeExpressCallback(controllerCallback: ControllerHandle
         response.status(httpResponse.statusCode).send({ ...httpResponse.body });
       })
       .catch((error) => {
-        logger.error(error.message);
-        response.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ error: "An unknown server error ocurred." });
+        return next(error);
       });
   };
 }

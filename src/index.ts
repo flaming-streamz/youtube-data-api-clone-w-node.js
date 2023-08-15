@@ -12,6 +12,7 @@ import { Server } from "socket.io";
 import { disconnectFromDatabase } from "./database/connection";
 import EnvironmentVars from "@/constants/env-vars";
 import commentsRouter from "@/modules/comments";
+import errorMiddleware from "@/middlewares/error-middleware";
 
 const app = express();
 
@@ -29,6 +30,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/api/v1" + "/comments", commentsRouter);
 
 // Error middleware
+app.use(errorMiddleware);
 
 const PORT = process.env.PORT || 8080;
 const server = app.listen(PORT, () => {});
