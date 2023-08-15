@@ -2,7 +2,9 @@ import { prop, Ref } from "@typegoose/typegoose";
 
 import { Video } from "./video-schema";
 
-class CommentAuthor {}
+class CommentAuthor {
+  name!: string;
+}
 
 export class Comment {
   @prop({ type: () => String })
@@ -13,4 +15,9 @@ export class Comment {
 
   @prop({ ref: () => Video })
   videoId?: Ref<Video>;
+
+  @prop({ type: String, unique: true })
+  hash!: string;
+
+  author?: CommentAuthor;
 }

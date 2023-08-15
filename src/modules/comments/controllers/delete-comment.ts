@@ -1,4 +1,4 @@
-import { HTTPRequest } from "@/utils/express-callback";
+import type { HTTPRequest } from "@/utils/express-callback";
 
 export default function makeDeleteComment({
   removeComment,

@@ -1,11 +1,11 @@
 import mongoose from "mongoose";
 
-export type Id = typeof Id;
-export type ResourceObjectId = (typeof Id)["makeId"];
+export type ObjectIdType = typeof ObjectId;
+export type ResourceObjectId = ReturnType<(typeof ObjectId)["getId"]>;
 
-const Id = Object.freeze({
-  makeId: mongoose.Schema.ObjectId.toString(),
+const ObjectId = Object.freeze({
+  getId: () => mongoose.Schema.ObjectId.toString(),
   isValid: mongoose.isValidObjectId,
 });
 
-export default Id;
+export default ObjectId;

@@ -1,40 +1,47 @@
-import type { Id, ResourceObjectId } from "@/utils/object-id";
+import type { ObjectIdType, ResourceObjectId } from "@/utils/object-id";
+import { MakeSourceHandler } from "./comment-source";
+import { Source } from "../interfaces";
 
 interface CommentInput {
   author: string;
-  createdAt: Date;
-  id: ResourceObjectId;
-  source: string;
-  postId: string;
-  published: boolean;
-  replyToId: string;
-  updatedAt: Date;
+  createdAt?: Date;
+  id?: ResourceObjectId;
+  source: Source;
+  videoId?: string;
+  published?: boolean;
+  replyToId?: string;
+  updatedAt?: Date;
   text: string;
 }
 
 export default function buildMakeComment({
-  Id,
+  ObjectId,
   makeSource,
   md5,
   sanitize,
+  validateInput,
 }: {
-  Id: Id;
+  ObjectId: ObjectIdType;
   md5: (text: string) => string;
   sanitize(text: string): string;
-  makeSource: any;
+  makeSource: MakeSourceHandler;
+  validateInput: <T = any>(commentInput: T) => T;
 }) {
   return function makeComment({
     author,
-    createdAt,
-    id = Id.makeId,
-    postId,
+    id = ObjectId.getId(),
+    videoId,
     published,
     replyToId,
     source,
     text,
-    updatedAt,
   }: CommentInput) {
     // validations here
+    if (!ObjectId.isValid(id)) throw new Error("Comment must be a valid ObjectId.");
+
+    const validSource = makeSource(source);
+
+    const {} = validateInput({ text: text });
 
     // sanitize comment text
     let sanitizedText = sanitize(text).trim();
@@ -45,6 +52,7 @@ export default function buildMakeComment({
       getId: () => id,
       getText: () => sanitizedText,
       getHash: () => hash || (hash = makeHash()),
+      getSource: () => validSource,
       isPublished: () => published,
       isDeleted: () => sanitizedText === deletedText,
       markDeleted: () => {
@@ -57,7 +65,7 @@ export default function buildMakeComment({
     });
 
     function makeHash() {
-      return md5(sanitizedText + published + (author || "") + (postId || "") + (replyToId || ""));
+      return md5(sanitizedText + published + (author || "") + (videoId || "") + (replyToId || ""));
     }
   };
 }
