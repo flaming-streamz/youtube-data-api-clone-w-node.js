@@ -1,3 +1,5 @@
+import { HTTPRequest } from "@/utils/express-callback";
+
 export default function makeDeleteComment({
   removeComment,
   logger,
@@ -5,7 +7,7 @@ export default function makeDeleteComment({
   removeComment: ({ id }: { id: string }) => Promise<{ deletedCount: number }>;
   logger: any;
 }) {
-  return async function deleteComment(httpRequest: any) {
+  return async function deleteComment(httpRequest: HTTPRequest<{ id: string }>) {
     const headers = {
       "Content-Type": "application/json",
     };
@@ -15,7 +17,7 @@ export default function makeDeleteComment({
       return {
         headers,
         statusCode: deletedComment.deletedCount === 0 ? 404 : 200,
-        body: { deleteComment },
+        body: { deletedComment },
       };
     } catch (error: any) {
       logger.error("Delete comment controller error ~ ", error);

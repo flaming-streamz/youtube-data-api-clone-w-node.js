@@ -1,7 +1,7 @@
 import makeComment from "../comment";
 
-import { ResourceObjectId } from "@/utils/object-id";
-import { CommentsDbType } from "../data-access";
+import type { ResourceObjectId } from "@/utils/object-id";
+import type { CommentsDbType } from "../data-access";
 
 export default function makeRemoveComment({ commentsRepo }: { commentsRepo: CommentsDbType }) {
   return async function removeComment({ id }: { id: ResourceObjectId }) {
@@ -14,6 +14,7 @@ export default function makeRemoveComment({ commentsRepo }: { commentsRepo: Comm
     if (await hasRepiles(commentToDelete.id)) {
       return softDelete(commentToDelete);
     }
+    
     if (await isOnlyReplyOfDeletedParent(commentToDelete)) {
       return deleteCommentAndParent(commentToDelete);
     }

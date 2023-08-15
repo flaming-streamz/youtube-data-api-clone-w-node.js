@@ -1,11 +1,16 @@
+import "reflect-metadata";
+
+import "dotenv/config";
+
 import cors from "cors";
 import compression from "compression";
 import helmet from "helmet";
-
 import express from "express";
+import { Server } from "socket.io";
 
 import { disconnectFromDatabase } from "./database/connection";
-import socketIO from "socket.io";
+import EnvironmentVars from "@/constants/env-vars";
+import commentsRouter from "@/modules/comments";
 
 const app = express();
 
@@ -20,13 +25,14 @@ app.use(express.urlencoded({ extended: true }));
 // Rate limiting middleware
 
 // modules router handler middlewares
+app.use(EnvironmentVars.API_ROOT + "/comments", commentsRouter);
 
 // Error middleware
 
 const PORT = process.env.PORT || 8080;
 const server = app.listen(PORT, () => {});
 
-const io = new socketIO.Server(server);
+const io = new Server(server);
 console.log(io);
 
 // Gracefully shutdown server and database
