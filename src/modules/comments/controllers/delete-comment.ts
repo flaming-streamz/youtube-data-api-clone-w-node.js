@@ -1,16 +1,18 @@
 import { HTTPRequest } from "@/utils/express-callback";
+import type { Logger } from "@/utils/logger";
 
 export default function makeDeleteComment({
   removeComment,
   logger,
 }: {
   removeComment: ({ id }: { id: string }) => Promise<{ deletedCount: number }>;
-  logger: any;
+  logger: Logger;
 }) {
   return async function deleteComment(httpRequest: HTTPRequest<{ id: string }>) {
     const headers = {
       "Content-Type": "application/json",
     };
+
     try {
       const deletedComment = await removeComment({ id: httpRequest.params.id });
 
@@ -20,7 +22,7 @@ export default function makeDeleteComment({
         body: { deletedComment },
       };
     } catch (error: any) {
-      logger.error("Delete comment controller error ~ ", error);
+      logger.error(error, "Delete comment controller error");
       return {
         headers,
         statusCode: 400,

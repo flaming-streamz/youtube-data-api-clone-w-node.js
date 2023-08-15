@@ -1,9 +1,9 @@
 import { Router } from "express";
 import makeCallback from "@/utils/express-callback";
 
-import commentsController from "./controllers";
+import { deleteComment } from "./controllers";
 
 const commentsRouter = Router();
-commentsRouter.delete("/:id", makeCallback(commentsController.deleteComment));
+commentsRouter.delete("/:id", makeCallback(deleteComment));
 
 export default commentsRouter;

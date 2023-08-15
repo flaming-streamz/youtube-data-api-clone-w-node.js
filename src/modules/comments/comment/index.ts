@@ -1,6 +1,6 @@
 import crypto from "node:crypto";
 import sanitizeHtml from "sanitize-html";
-import ipRegex from "ip-regex";
+import { isIP } from "node:net";
 
 import Id from "@/utils/object-id";
 
@@ -11,7 +11,8 @@ const makeSource = buildMakeCommentSource({ isValidIp });
 const makeComment = buildMakeComment({ Id: Id, md5, sanitize, makeSource });
 
 function isValidIp(ip: string) {
-  return ipRegex({ exact: true }).test(ip);
+  if (isIP(ip) === 0) return false;
+  return true;
 }
 
 function md5(text: string) {

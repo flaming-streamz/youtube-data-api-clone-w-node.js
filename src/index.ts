@@ -1,4 +1,5 @@
 import "reflect-metadata";
+import "module-alias/register";
 
 import "dotenv/config";
 
@@ -25,7 +26,7 @@ app.use(express.urlencoded({ extended: true }));
 // Rate limiting middleware
 
 // modules router handler middlewares
-app.use(EnvironmentVars.API_ROOT + "/comments", commentsRouter);
+app.use("/api/v1" + "/comments", commentsRouter);
 
 // Error middleware
 
@@ -33,7 +34,6 @@ const PORT = process.env.PORT || 8080;
 const server = app.listen(PORT, () => {});
 
 const io = new Server(server);
-console.log(io);
 
 // Gracefully shutdown server and database
 const shutdownSignals = ["SIGTERM", "SIGINT"];

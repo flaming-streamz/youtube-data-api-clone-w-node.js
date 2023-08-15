@@ -1,7 +1,8 @@
 import express from "express";
 import { StatusCodes } from "http-status-codes";
+import logger from "./logger";
 
-export interface HTTPRequest<ParamsDictionary = any, RequestBody = any, QueryDictionary = any> {
+export interface HTTPRequest<ParamsDictionary = any, RequestBody = {}, QueryDictionary = any> {
   body: RequestBody;
   query: QueryDictionary;
   params: ParamsDictionary;
@@ -35,8 +36,6 @@ export default function makeExpressCallback(controllerCallback: ControllerHandle
       },
     };
 
-    console.log("express-callback.ts ~ httpRequest:", httpRequest);
-
     controllerCallback(httpRequest)
       .then((httpResponse) => {
         if (httpResponse.headers) {
@@ -46,7 +45,7 @@ export default function makeExpressCallback(controllerCallback: ControllerHandle
         response.status(httpResponse.statusCode).send({ ...httpResponse.body });
       })
       .catch((error) => {
-        console.log("express-callback.ts caught error ~", error);
+        logger.error(error.message);
         response.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ error: "An unknown server error ocurred." });
       });
   };
