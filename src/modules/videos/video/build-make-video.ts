@@ -1,16 +1,31 @@
+/**
+ * Video uploaded here must conform to the below rules
+ *
+ * Maximum file size: 200MB
+ * Accepted Media MIME types: video/*, application/octet-stream
+ */
+
 interface Video {
-  titleText: string;
+  title: string;
+  description: string;
 }
 
-export default function buildMakeVideo({ validateInput }: { validateInput: (input: { title: string }) => boolean }) {
-  return function makeVideo({ titleText }: Video) {
+interface VideoInput {
+  title: string;
+  description: string;
+}
+
+export default function buildMakeVideo({ validateInput }: { validateInput: (input: VideoInput) => boolean }) {
+  return function makeVideo({ title, description }: Video) {
     // validate input for video metadata
     validateInput({
-      title: titleText,
+      title,
+      description,
     });
 
     return Object.freeze({
-      getTitle: () => titleText,
+      getTitle: () => title,
+      getDescription: () => description,
     });
   };
 }

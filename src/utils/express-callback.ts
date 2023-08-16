@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import express from "express";
 
-export interface HTTPRequest<ParamsDictionary = any, RequestBody = {}, QueryDictionary = any> {
+export interface HTTPRequest<ParamsDictionary = any, RequestBody = any, QueryDictionary = any> {
   body: RequestBody;
   query: QueryDictionary;
   params: ParamsDictionary;

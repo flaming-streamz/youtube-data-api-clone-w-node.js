@@ -2,7 +2,7 @@
 
 import buildMakeVideo from "./build-make-video";
 
-const makeVideo = buildMakeVideo({ validateInput });
+export const makeVideo = buildMakeVideo({ validateInput });
 
 export default makeVideo;
 

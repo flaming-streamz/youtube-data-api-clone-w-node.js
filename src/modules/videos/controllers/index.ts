@@ -1,10 +1,15 @@
-import { removeVideo } from "../use-cases";
+import { removeVideo, insertVideo } from "../use-cases";
 
 import makeDeleteVideo from "./delete-video";
+import makePostVideo from "./post-video";
 
 const deleteVideo = makeDeleteVideo({ removeVideo });
-const videosContoller = Object.freeze({ deleteVideo });
+const postVideo = makePostVideo({ insertVideo });
+
+const videosContoller = Object.freeze({ deleteVideo, postVideo });
 
 export type RemoveVideoServiceHandler = typeof removeVideo;
-export { deleteVideo };
+export type InsertVideoServiceHandler = typeof insertVideo;
+
+export { deleteVideo, postVideo };
 export default videosContoller;

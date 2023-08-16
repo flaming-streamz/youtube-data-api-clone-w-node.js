@@ -12,7 +12,7 @@ import morgan from "morgan";
 
 import EnvironmentVars from "@/constants/env-vars";
 import logger from "@/utils/logger";
-import { disconnectFromDatabase } from "./database/connection";
+import { disconnectFromDatabase, connectToDatabase } from "./database/connection";
 import errorMiddleware from "@/middlewares/error-middleware";
 
 import commentsRouter from "@/modules/comments";
@@ -43,6 +43,9 @@ app.use(errorMiddleware);
 const PORT = process.env.PORT || 8080;
 const server = app.listen(PORT, () => {
   logger.info("Server now online");
+
+  // connect to database
+  connectToDatabase();
 });
 
 // const io = new Server(server);
