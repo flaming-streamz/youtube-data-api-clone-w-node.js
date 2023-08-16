@@ -9,10 +9,11 @@ import helmet from "helmet";
 import express from "express";
 import { Server } from "socket.io";
 
-import { disconnectFromDatabase } from "./database/connection";
 import EnvironmentVars from "@/constants/env-vars";
-import commentsRouter from "@/modules/comments";
+import { disconnectFromDatabase } from "./database/connection";
 import errorMiddleware from "@/middlewares/error-middleware";
+import commentsRouter from "@/modules/comments";
+import videosRouter from "@/modules/videos";
 
 const app = express();
 
@@ -28,6 +29,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // modules router handler middlewares
 app.use("/api/v1" + "/comments", commentsRouter);
+app.use("/api/v2" + "/videos", videosRouter);
 
 // Error middleware
 app.use(errorMiddleware);

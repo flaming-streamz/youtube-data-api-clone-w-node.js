@@ -11,6 +11,8 @@ export default function makeVideosDb({ database }: { database: DatabaseModelsTyp
     insert,
     update,
     remove,
+    findLikedVideos,
+    findWatchHistory,
   });
 
   async function findAll() {
@@ -36,4 +38,7 @@ export default function makeVideosDb({ database }: { database: DatabaseModelsTyp
   async function update(id: string, videoUpdate: Partial<Video>) {
     await videosModel.updateOne({ _id: id }, { $set: { ...videoUpdate } });
   }
+
+  async function findLikedVideos() {}
+  async function findWatchHistory() {}
 }
