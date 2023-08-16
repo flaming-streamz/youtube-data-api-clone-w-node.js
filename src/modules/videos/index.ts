@@ -6,6 +6,6 @@ import { deleteVideo, postVideo } from "./controllers";
 // https://www.youtubeclone.com/api/v1/videos
 const videosRouter = Router();
 videosRouter.delete("/", makeCallback(deleteVideo));
-videosRouter.post("/upload", makeCallback(postVideo));
+videosRouter.post("/", makeCallback(postVideo));
 
 export default videosRouter;

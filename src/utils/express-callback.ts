@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import express from "express";
+import { IncomingHttpHeaders } from "http";
 
 export interface HTTPRequest<ParamsDictionary = any, RequestBody = any, QueryDictionary = any> {
   body: RequestBody;
@@ -8,7 +9,7 @@ export interface HTTPRequest<ParamsDictionary = any, RequestBody = any, QueryDic
   ip: string;
   method: string;
   path: string;
-  headers: { [key: string]: string | undefined };
+  headers: IncomingHttpHeaders;
 }
 
 interface HTTPResponse {
@@ -29,6 +30,7 @@ export default function makeExpressCallback(controllerCallback: ControllerHandle
       method: request.method,
       path: request.path,
       headers: {
+        ...request.headers,
         "Content-Type": request.get("Content-Type"),
         Referer: request.get("referer"),
         "User-Agent": request.get("User-Agent"),

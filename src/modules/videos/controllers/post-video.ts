@@ -1,4 +1,5 @@
 import { StatusCodes } from "http-status-codes";
+// import busboy from "busboy";
 
 import type { HTTPRequest } from "@/utils/express-callback";
 import type { InsertVideoServiceHandler } from ".";
@@ -6,7 +7,7 @@ import type { Status } from "../interfaces";
 
 interface VideoReqBody {
   snippet: { title: string; description: string };
-  recordingDetails?: { recordingDetails: string };
+  recordingDetails: { recordingDetails: string };
   status?: Status;
 }
 
@@ -23,7 +24,7 @@ const allowedPartParams: VideoPartParams[] = ["id", "snippet", "liveStreamingDet
 export default function makePostVideo({ insertVideo }: { insertVideo: InsertVideoServiceHandler }) {
   return async function postVideo(request: HTTPRequest<object, VideoReqBody, VideoQueryParams>) {
     const { part, notifySubscribers } = request.query;
-    if (!part || part.length < 1) throw new Error("Provide video part.");
+    if (!part || part.length < 1) throw new Error("Provide the video part query parameter.");
     const partArray: VideoPartParams[] = part.split(",").map((str) => str.trim() as VideoPartParams);
 
     // check provided part array for invalid entries
@@ -35,12 +36,27 @@ export default function makePostVideo({ insertVideo }: { insertVideo: InsertVide
         );
     });
 
-    if (notifySubscribers) {
-      console.log("Subscribers will be notified.");
+    if (notifySubscribers && notifySubscribers === true) {
+      // TODO: Implement notifying subscribers
     }
 
+    // Upload video
+    // TODO: Expect to only receive video url, later after video is uploaded to our custom server
+    // const bb = busboy({ headers: request.headers });
+
+    // bb.on("file", (name, file, info) => {
+    //   const { filename } = info;
+    //   console.log(filename);
+    // });
+
+    // bb.on("field", (name, val, info) => {
+    //   console.log(`Field [${name}]: value: %j`, val);
+    // });
+
+    // Deal with video meta data
     const {
       snippet: { title, description },
+      //   recordingDetails: { recordingDetails }
     } = request.body;
 
     const insertedVideo = await insertVideo({
@@ -48,9 +64,10 @@ export default function makePostVideo({ insertVideo }: { insertVideo: InsertVide
       description,
     });
 
-    console.log(insertedVideo);
-
+    // Genrate response body
     const result: Partial<{ [key in VideoPartParams | "etag"]: unknown }> = {};
+    result["etag"] = insertedVideo._id.toHexString() + insertedVideo._id.toHexString();
+
     if (partArray.includes("id")) {
       result["id"] = insertedVideo._id;
     }
@@ -60,7 +77,7 @@ export default function makePostVideo({ insertVideo }: { insertVideo: InsertVide
       result["snippet"] = {
         title: insertedVideo.title,
         description: insertedVideo.description,
-      } as { title: string };
+      };
     }
 
     // Video Live streaming details
