@@ -4,6 +4,6 @@ import makeCallback from "@/utils/express-callback";
 import { deleteVideo } from "./controllers";
 
 const videosRouter = Router();
-videosRouter.delete("/:id", makeCallback(deleteVideo));
+videosRouter.delete("/", makeCallback(deleteVideo));
 
 export default videosRouter;
