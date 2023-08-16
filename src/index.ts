@@ -7,11 +7,13 @@ import cors from "cors";
 import compression from "compression";
 import helmet from "helmet";
 import express from "express";
-import { Server } from "socket.io";
+// import { Server } from "socket.io";
 
 import EnvironmentVars from "@/constants/env-vars";
+import logger from "@/utils/logger";
 import { disconnectFromDatabase } from "./database/connection";
 import errorMiddleware from "@/middlewares/error-middleware";
+
 import commentsRouter from "@/modules/comments";
 import videosRouter from "@/modules/videos";
 
@@ -28,8 +30,8 @@ app.use(express.urlencoded({ extended: true }));
 // Rate limiting middleware
 
 // modules router handler middlewares
-app.use("/api/v1" + "/comments", commentsRouter);
-app.use("/api/v2" + "/videos", videosRouter);
+app.use(`${EnvironmentVars.API_ROOT}/comments`, commentsRouter);
+app.use(`${EnvironmentVars.API_ROOT}/videos`, videosRouter);
 
 // Error middleware
 app.use(errorMiddleware);
@@ -37,7 +39,7 @@ app.use(errorMiddleware);
 const PORT = process.env.PORT || 8080;
 const server = app.listen(PORT, () => {});
 
-const io = new Server(server);
+// const io = new Server(server);
 
 // Gracefully shutdown server and database
 const shutdownSignals = ["SIGTERM", "SIGINT"];
@@ -47,7 +49,7 @@ function gracefulShutdown(signal: string) {
     disconnectFromDatabase();
 
     server.close((error) => {
-      console.log("Server wasnot open!", error?.message);
+      logger.error(error, "Server wasnot open!");
     });
 
     // release resources if any or need be.
