@@ -8,6 +8,7 @@ import compression from "compression";
 import helmet from "helmet";
 import express from "express";
 // import { Server } from "socket.io";
+import morgan from "morgan";
 
 import EnvironmentVars from "@/constants/env-vars";
 import logger from "@/utils/logger";
@@ -26,6 +27,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // use morgan middleware only in development
+if (EnvironmentVars.NODE_ENV === "development") {
+  app.use(morgan("common", { immediate: true }));
+}
 
 // Rate limiting middleware
 
