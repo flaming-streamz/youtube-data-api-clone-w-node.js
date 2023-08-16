@@ -37,7 +37,9 @@ app.use(`${EnvironmentVars.API_ROOT}/videos`, videosRouter);
 app.use(errorMiddleware);
 
 const PORT = process.env.PORT || 8080;
-const server = app.listen(PORT, () => {});
+const server = app.listen(PORT, () => {
+  logger.info("Server now online");
+});
 
 // const io = new Server(server);
 
