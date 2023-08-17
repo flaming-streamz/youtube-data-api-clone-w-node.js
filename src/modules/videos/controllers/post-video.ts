@@ -11,7 +11,14 @@ interface VideoReqBody {
   status?: Status;
 }
 
-type VideoPartParams = "id" | "snippet" | "liveStreamingDetails" | "contentDetails" | "fileDetails";
+type VideoPartParams =
+  | "id"
+  | "snippet"
+  | "statistics"
+  | "liveStreamingDetails"
+  | "contentDetails"
+  | "fileDetails"
+  | "status";
 
 // ?part=id,snippet
 interface VideoQueryParams {
@@ -19,7 +26,15 @@ interface VideoQueryParams {
   notifySubscribers: boolean;
 }
 
-const allowedPartParams: VideoPartParams[] = ["id", "snippet", "liveStreamingDetails", "fileDetails", "contentDetails"];
+const allowedPartParams: VideoPartParams[] = [
+  "id",
+  "snippet",
+  "status",
+  "statistics",
+  "liveStreamingDetails",
+  "fileDetails",
+  "contentDetails",
+];
 
 export default function makePostVideo({ insertVideo }: { insertVideo: InsertVideoServiceHandler }) {
   return async function postVideo(request: HTTPRequest<object, VideoReqBody, VideoQueryParams>) {
@@ -42,7 +57,7 @@ export default function makePostVideo({ insertVideo }: { insertVideo: InsertVide
 
     // Upload video
     // TODO: Expect to only receive video url, later after video is uploaded to our custom server
-    // const bb = busboy({ headers: request.headers });
+    // const bb = busboy({ headers: request.headers, preservePath: true });
 
     // bb.on("file", (name, file, info) => {
     //   const { filename } = info;
@@ -66,7 +81,7 @@ export default function makePostVideo({ insertVideo }: { insertVideo: InsertVide
 
     // Genrate response body
     const result: Partial<{ [key in VideoPartParams | "etag"]: unknown }> = {};
-    result["etag"] = insertedVideo._id.toHexString() + insertedVideo._id.toHexString();
+    result["etag"] = insertedVideo.etag;
 
     if (partArray.includes("id")) {
       result["id"] = insertedVideo._id;
@@ -74,15 +89,41 @@ export default function makePostVideo({ insertVideo }: { insertVideo: InsertVide
 
     // Video Snippet details
     if (partArray.includes("snippet")) {
+      // console.log(insertedVideo.channelDetails);
       result["snippet"] = {
         title: insertedVideo.title,
         description: insertedVideo.description,
+        publishedAt: insertedVideo.createdAt,
+        modifiedOn: insertedVideo.updatedAt,
+        thumbnails: insertedVideo.thumbnails,
+        hasCustomThumbnail: insertedVideo.hasCustomThumbnail,
+        channelId: insertedVideo.channelDetails.channelId,
+        channelTitle: insertedVideo.channelDetails.channelTitle,
+        categoryId: insertedVideo.categoryId || "xx-unidentified-xx",
       };
     }
 
+    // Video Status details
+    if (partArray.includes("status") && insertedVideo.status) {
+      const { ...rest } = insertedVideo.status;
+      result["status"] = {
+        ...rest,
+      };
+    }
+
+    // Video Content details
+    if (partArray.includes("contentDetails") && insertedVideo.contentDetails) {
+      result["contentDetails"] = { ...insertedVideo.contentDetails };
+    }
+
+    // Video Statistics details
+    if (partArray.includes("statistics") && insertedVideo.statistics) {
+      result["statistics"] = { ...insertedVideo.statistics };
+    }
+
     // Video Live streaming details
-    if (partArray.includes("liveStreamingDetails")) {
-      result["liveStreamingDetails"] = {};
+    if (partArray.includes("liveStreamingDetails") && insertedVideo.liveStreamingDetails) {
+      result["liveStreamingDetails"] = { ...insertedVideo.liveStreamingDetails };
     }
 
     return {

@@ -10,9 +10,12 @@ export default function makeInsertVideo({ videosRepo }: { videosRepo: VideosDbTy
   return async function insertVideo(videoInfo: VideoInfo) {
     const video = makeVideo({ title: videoInfo.title, description: videoInfo.description });
 
+    const etag = await video.getEtag();
+
     return videosRepo.insert({
       title: video.getTitle(),
       description: video.getDescription(),
+      etag: etag,
     });
   };
 }

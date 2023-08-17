@@ -8,6 +8,7 @@
 interface Video {
   title: string;
   description: string;
+  isPrivate?: boolean;
 }
 
 interface VideoInput {
@@ -15,8 +16,14 @@ interface VideoInput {
   description: string;
 }
 
-export default function buildMakeVideo({ validateInput }: { validateInput: (input: VideoInput) => boolean }) {
-  return function makeVideo({ title, description }: Video) {
+export default function buildMakeVideo({
+  validateInput,
+  makeRandomString,
+}: {
+  validateInput: (input: VideoInput) => boolean;
+  makeRandomString(): Promise<string>;
+}) {
+  return function makeVideo({ title, description, isPrivate = false }: Video) {
     // validate input for video metadata
     validateInput({
       title,
@@ -26,6 +33,16 @@ export default function buildMakeVideo({ validateInput }: { validateInput: (inpu
     return Object.freeze({
       getTitle: () => title,
       getDescription: () => description,
+      getIsPrivate: () => isPrivate,
+      getEtag: () => makeEtag(),
+
+      markPrivate: () => {
+        isPrivate = true;
+      },
     });
+
+    async function makeEtag() {
+      return makeRandomString();
+    }
   };
 }

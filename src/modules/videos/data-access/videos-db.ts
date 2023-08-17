@@ -1,6 +1,7 @@
 import { DatabaseModelsType } from "@/models/index";
 import { Video } from "@/schemas/video-schema";
 import { ResourceObjectId } from "@/utils/object-id";
+import { DocumentType } from "@typegoose/typegoose";
 
 export default function makeVideosDb({ database }: { database: DatabaseModelsType }) {
   const { videos: videosModel } = database;
@@ -30,9 +31,9 @@ export default function makeVideosDb({ database }: { database: DatabaseModelsTyp
     return { deletedCount: result.deletedCount };
   }
 
-  async function insert(video: Video) {
-    const result = await videosModel.create({ ...video });
-    return result;
+  async function insert(video: Partial<Video>) {
+    const result: DocumentType<Video> = await videosModel.create({ ...video });
+    return result.toJSON();
   }
 
   async function update(id: string, videoUpdate: Partial<Video>) {
