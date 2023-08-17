@@ -1,17 +1,26 @@
 type DateTime = string;
 
+export type VideoPartParams =
+  | "id"
+  | "snippet"
+  | "statistics"
+  | "liveStreamingDetails"
+  | "contentDetails"
+  | "fileDetails"
+  | "status";
+
 type ThumbnailKey = "default" | "medium" | "high" | "standard" | "maxres";
 
 export interface VideoResource {
   kind: string;
   etag: string;
   id: string;
-  snippet: Snippet;
-  status: Status;
-  statistics: Statistics;
-  recordingDetails: RecordingDetails;
-  fileDetails: FileDetails;
-  liveStreamDetails: LiveStreamingDetails;
+  snippet?: Snippet;
+  status?: Status;
+  statistics?: Statistics;
+  recordingDetails?: RecordingDetails;
+  fileDetails?: FileDetails;
+  liveStreamDetails?: LiveStreamingDetails;
 }
 
 export interface Snippet {
