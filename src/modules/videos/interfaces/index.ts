@@ -35,7 +35,7 @@ export interface Thumbnail {
 
 export interface ContentDetails {
   duration: number;
-  dimensio: string;
+  dimension: string;
   definition: "hd" | "sd";
   caption: boolean;
   licensedContent: boolean;
