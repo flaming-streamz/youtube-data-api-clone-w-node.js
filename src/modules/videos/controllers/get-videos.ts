@@ -1,8 +1,9 @@
-import { HTTPRequest } from "@/utils/express-callback";
 import { StatusCodes } from "http-status-codes";
-import { VideoPartParams } from "../interfaces";
-import { ListVideosServiceHandler } from ".";
-import { Video } from "@/schemas/video-schema";
+
+import type { HTTPRequest } from "@/utils/express-callback";
+import type { VideoPartParams } from "../interfaces";
+import type { Video } from "@/schemas/video-schema";
+import type { ListVideosServiceHandler } from ".";
 
 // ?part=id,snippet
 interface VideoQueryParams {
@@ -59,8 +60,6 @@ export default function makeGetVideos({ listVideos }: { listVideos: ListVideosSe
       body: {
         kind: "youtubeclone#videos-list-response",
         etag: result.etag,
-        // nextPageToken: "VVVXXX",
-        // prevPageToken: "QQQAAA",
         ...data.pagination,
         pageInfo: {
           totalResults: videos.length,
@@ -101,3 +100,5 @@ export default function makeGetVideos({ listVideos }: { listVideos: ListVideosSe
     });
   }
 }
+
+// ***********************************************************

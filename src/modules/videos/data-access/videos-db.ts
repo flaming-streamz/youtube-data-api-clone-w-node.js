@@ -3,8 +3,14 @@ import { Video } from "@/schemas/video-schema";
 import { ResourceObjectId } from "@/utils/object-id";
 import { DocumentType } from "@typegoose/typegoose";
 import { FilterQuery } from "mongoose";
+import { GeneratePaginationCodesHandler } from ".";
 
-export default function makeVideosDb({ database }: { database: DatabaseModelsType }) {
+interface MakeVideosDbFactory {
+  database: DatabaseModelsType;
+  generatePaginationCodes: GeneratePaginationCodesHandler;
+}
+
+export default function makeVideosDb({ database, generatePaginationCodes }: MakeVideosDbFactory) {
   const { videos: videosModel } = database;
 
   return Object.freeze({
@@ -45,12 +51,20 @@ export default function makeVideosDb({ database }: { database: DatabaseModelsTyp
     const results = await query;
     const totalResults = await videosModel.countDocuments({ ...filterQuery });
 
-    const pagination: Partial<{ [key in "nextPageToken" | "prevPageToken"]: number | string }> = {};
+    const { numbers, tokens } = generatePaginationCodes(page);
+    console.log(numbers);
+    console.log(tokens);
+
+    const pagination: Partial<{
+      [key in "nextPageToken" | "nextPageNumber" | "prevPageToken" | "prevPageNumber"]: number | string;
+    }> = {};
     if (endIndex < totalResults) {
-      pagination["nextPageToken"] = page + 1;
+      pagination["nextPageNumber"] = page + 1;
+      pagination["nextPageToken"] = tokens.nextPageToken;
     }
     if (startIndex > 0) {
-      pagination["prevPageToken"] = page - 1;
+      pagination["prevPageNumber"] = page - 1;
+      pagination["prevPageToken"] = tokens.prevPageToken;
     }
 
     return { results: results.map((result) => result.toJSON()), totalResults, pagination };
