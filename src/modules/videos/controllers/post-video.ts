@@ -3,22 +3,13 @@ import { StatusCodes } from "http-status-codes";
 
 import type { HTTPRequest } from "@/utils/express-callback";
 import type { InsertVideoServiceHandler } from ".";
-import type { Status } from "../interfaces";
+import type { Status, VideoPartParams } from "../interfaces";
 
 interface VideoReqBody {
   snippet: { title: string; description: string };
   recordingDetails: { recordingDetails: string };
   status?: Status;
 }
-
-type VideoPartParams =
-  | "id"
-  | "snippet"
-  | "statistics"
-  | "liveStreamingDetails"
-  | "contentDetails"
-  | "fileDetails"
-  | "status";
 
 // ?part=id,snippet
 interface VideoQueryParams {

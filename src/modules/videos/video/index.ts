@@ -10,5 +10,5 @@ function validateInput({ title }: { title: string }) {
 
 async function makeRandomString() {
   const { randomBytes } = await import("node:crypto");
-  return randomBytes(48).toString("hex");
+  return randomBytes(32).toString("hex");
 }
