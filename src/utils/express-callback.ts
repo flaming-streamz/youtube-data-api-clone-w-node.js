@@ -31,9 +31,6 @@ export default function makeExpressCallback(controllerCallback: ControllerHandle
       path: request.path,
       headers: {
         ...request.headers,
-        "Content-Type": request.get("Content-Type"),
-        Referer: request.get("referer"),
-        "User-Agent": request.get("User-Agent"),
       },
     };
 
