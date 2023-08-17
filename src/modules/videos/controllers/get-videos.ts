@@ -8,6 +8,8 @@ import { Video } from "@/schemas/video-schema";
 interface VideoQueryParams {
   part: string;
   order: "date" | "relevance" | "viewCount";
+  maxResults: string;
+  page: string;
 }
 
 const allowedPartParams: VideoPartParams[] = [
@@ -22,7 +24,7 @@ const allowedPartParams: VideoPartParams[] = [
 
 export default function makeGetVideos({ listVideos }: { listVideos: ListVideosServiceHandler }) {
   return async function getVideos(request: HTTPRequest<object, object, VideoQueryParams>) {
-    const { part, order } = request.query;
+    const { part, order, maxResults, page } = request.query;
 
     if (!part || part.length < 1) throw new Error("Provide the video part query parameter.");
     const partArray: VideoPartParams[] = part.split(",").map((str) => str.trim() as VideoPartParams);
@@ -36,9 +38,12 @@ export default function makeGetVideos({ listVideos }: { listVideos: ListVideosSe
         );
     });
 
+    const pageNumber = parseInt(page, 10) || 1;
+    const limit = parseInt(maxResults, 10) || 10;
+
     // get videos
     type ReturnedVideoType = Partial<Video> & { _id: string; __v: string };
-    const data = await listVideos({ sortBy: order || "date" });
+    const data = await listVideos({ sortBy: order || "date", limit, page: pageNumber });
     const videos = data.results as unknown as ReturnedVideoType[];
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -54,11 +59,12 @@ export default function makeGetVideos({ listVideos }: { listVideos: ListVideosSe
       body: {
         kind: "youtubeclone#videos-list-response",
         etag: result.etag,
-        nextPageToken: "VVVXXX",
-        prevPageToken: "QQQAAA",
+        // nextPageToken: "VVVXXX",
+        // prevPageToken: "QQQAAA",
+        ...data.pagination,
         pageInfo: {
-          totalResults: data.totalResults,
-          resultsPerPage: "___",
+          totalResults: videos.length,
+          resultsPerPage: limit,
         },
         items: [...results],
       },

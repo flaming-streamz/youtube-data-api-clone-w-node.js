@@ -17,7 +17,15 @@ export default function makeVideosDb({ database }: { database: DatabaseModelsTyp
     findWatchHistory,
   });
 
-  async function findAll({ order }: { order: "date" | "relevance" | "viewCount" }) {
+  async function findAll({
+    order,
+    limit,
+    page,
+  }: {
+    order: "date" | "relevance" | "viewCount";
+    page: number;
+    limit: number;
+  }) {
     const filterQuery: FilterQuery<Video> = {};
 
     let query = videosModel.find({ ...filterQuery });
@@ -28,10 +36,24 @@ export default function makeVideosDb({ database }: { database: DatabaseModelsTyp
     }
     query = query.sort({ createdAt: "desc" });
 
+    // Pagination
+    const startIndex = (page - 1) * limit;
+    const endIndex = page * limit;
+
+    query = query.skip(startIndex).limit(limit);
+
     const results = await query;
     const totalResults = await videosModel.countDocuments({ ...filterQuery });
 
-    return { results: results.map((result) => result.toJSON()), totalResults };
+    const pagination: Partial<{ [key in "nextPageToken" | "prevPageToken"]: number | string }> = {};
+    if (endIndex < totalResults) {
+      pagination["nextPageToken"] = page + 1;
+    }
+    if (startIndex > 0) {
+      pagination["prevPageToken"] = page - 1;
+    }
+
+    return { results: results.map((result) => result.toJSON()), totalResults, pagination };
   }
 
   async function findById(id: ResourceObjectId) {
