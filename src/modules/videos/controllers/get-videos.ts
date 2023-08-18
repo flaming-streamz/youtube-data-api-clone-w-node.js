@@ -11,6 +11,7 @@ interface VideoQueryParams {
   order: "date" | "relevance" | "viewCount";
   maxResults: string;
   page: string;
+  chart: string; // TODO: implement filtering by chart. Either "mostPopular" | "latest"
   id: string;
 }
 
@@ -27,6 +28,19 @@ const allowedPartParams: VideoPartParams[] = [
 export default function makeGetVideos({ listVideos }: { listVideos: ListVideosServiceHandler }) {
   return async function getVideos(request: HTTPRequest<object, object, VideoQueryParams>) {
     const { part, order, maxResults, page, id } = request.query;
+
+    // Limit query filters ...
+    const possibleFilters: string[] = ["id", "chart"];
+    const queryKeysCount: string[] = [];
+    Object.keys(request.query).map((queryKey) => {
+      const filterQueryKeyFound = possibleFilters.includes(queryKey);
+      if (filterQueryKeyFound) {
+        queryKeysCount.push(queryKey);
+      }
+      if (queryKeysCount.length > 1) {
+        throw new Error(`Provided more than one filter key. Please specify only one`);
+      }
+    });
 
     if (!part || part.length < 1) throw new Error("Provide the video part query parameter.");
     const partArray: VideoPartParams[] = part.split(",").map((str) => str.trim() as VideoPartParams);

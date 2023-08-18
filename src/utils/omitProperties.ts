@@ -13,19 +13,19 @@ function omitProperties<T extends object, K extends keyof T>(obj: T, propertiesT
 
 // Example
 
-interface Person {
-  name: string;
-  age: number;
-  country: string;
-}
+// interface Person {
+//   name: string;
+//   age: number;
+//   country: string;
+// }
 
-const person: Person = {
-  name: "John",
-  age: 30,
-  country: "USA",
-};
+// const person: Person = {
+//   name: "John",
+//   age: 30,
+//   country: "USA",
+// };
 
-const newPersonWithoutAge = omitProperties(person, ["age"]);
-console.log(newPersonWithoutAge);
+// const newPersonWithoutAge = omitProperties(person, ["age"]);
+// console.log(newPersonWithoutAge);
 
 export default omitProperties;
