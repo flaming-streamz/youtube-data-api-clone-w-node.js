@@ -27,12 +27,18 @@ export default function makeVideosDb({ database, generatePaginationCodes }: Make
     order,
     limit,
     page,
+    id: videoIds,
   }: {
     order: "date" | "relevance" | "viewCount";
     page: number;
     limit: number;
+    id?: string[];
   }) {
-    const filterQuery: FilterQuery<Video> = {};
+    // Filtering here ...
+    let filterQuery: FilterQuery<Video> = {};
+    if (videoIds && videoIds.length > 0) {
+      filterQuery = { ...filterQuery, _id: { $in: videoIds } };
+    }
 
     let query = videosModel.find({ ...filterQuery });
 

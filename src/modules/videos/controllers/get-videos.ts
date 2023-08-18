@@ -11,6 +11,7 @@ interface VideoQueryParams {
   order: "date" | "relevance" | "viewCount";
   maxResults: string;
   page: string;
+  id: string;
 }
 
 const allowedPartParams: VideoPartParams[] = [
@@ -25,7 +26,7 @@ const allowedPartParams: VideoPartParams[] = [
 
 export default function makeGetVideos({ listVideos }: { listVideos: ListVideosServiceHandler }) {
   return async function getVideos(request: HTTPRequest<object, object, VideoQueryParams>) {
-    const { part, order, maxResults, page } = request.query;
+    const { part, order, maxResults, page, id } = request.query;
 
     if (!part || part.length < 1) throw new Error("Provide the video part query parameter.");
     const partArray: VideoPartParams[] = part.split(",").map((str) => str.trim() as VideoPartParams);
@@ -39,12 +40,24 @@ export default function makeGetVideos({ listVideos }: { listVideos: ListVideosSe
         );
     });
 
+    // Querying for Specific videos
+    let videoIds: string[] = [];
+    if (id) {
+      const ids: string[] = id.split(",").map((videoId) => videoId.trim());
+      if (ids.length > 1) {
+        videoIds = ids;
+      } else {
+        videoIds.push(id);
+      }
+    }
+
+    // Pagination parameters ...
     const pageNumber = parseInt(page, 10) || 1;
     const limit = parseInt(maxResults, 10) || 10;
 
     // get videos
     type ReturnedVideoType = Partial<Video> & { _id: string; __v: string };
-    const data = await listVideos({ sortBy: order || "date", limit, page: pageNumber });
+    const data = await listVideos({ sortBy: order || "date", limit, page: pageNumber, videoIds });
     const videos = data.results as unknown as ReturnedVideoType[];
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
