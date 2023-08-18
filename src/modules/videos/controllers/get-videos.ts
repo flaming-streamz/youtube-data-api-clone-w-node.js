@@ -34,16 +34,10 @@ export default function makeGetVideos({ listVideos }: { listVideos: ListVideosSe
 
     // part query parameter is required ...
     if (!part || part.length < 1) throw new Error("Provide the video part query parameter.");
-    const partArray: VideoPartParams[] = part.split(",").map((str) => str.trim() as VideoPartParams);
 
     // check provided part array for invalid entries
-    partArray.forEach((partStr) => {
-      const isAllowed = allowedPartParams.includes(partStr);
-      if (!isAllowed)
-        throw new Error(
-          `Parameter '${partStr}' is not accepted for part query parameter. Accepted values are ${allowedPartParams}`
-        );
-    });
+    const partArray: VideoPartParams[] = part.split(",").map((str) => str.trim() as VideoPartParams);
+    checkEntriesOnPartQueryParam(partArray);
 
     // Querying for Specific videos
     const videoIds = querySpecificVideos(id);
@@ -145,6 +139,16 @@ export default function makeGetVideos({ listVideos }: { listVideos: ListVideosSe
     }
 
     return videoIds;
+  }
+
+  function checkEntriesOnPartQueryParam(partArray: VideoPartParams[]) {
+    partArray.forEach((partStr) => {
+      const isAllowed = allowedPartParams.includes(partStr);
+      if (!isAllowed)
+        throw new Error(
+          `Parameter '${partStr}' is not accepted for part query parameter. Accepted values are ${allowedPartParams}`
+        );
+    });
   }
 }
 
