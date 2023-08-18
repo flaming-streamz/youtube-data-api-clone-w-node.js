@@ -30,18 +30,9 @@ export default function makeGetVideos({ listVideos }: { listVideos: ListVideosSe
     const { part, order, maxResults, page, id } = request.query;
 
     // Limit query filters ...
-    const possibleFilters: string[] = ["id", "chart"];
-    const queryKeysCount: string[] = [];
-    Object.keys(request.query).map((queryKey) => {
-      const filterQueryKeyFound = possibleFilters.includes(queryKey);
-      if (filterQueryKeyFound) {
-        queryKeysCount.push(queryKey);
-      }
-      if (queryKeysCount.length > 1) {
-        throw new Error(`Provided more than one filter key. Please specify only one`);
-      }
-    });
+    limitFilterQueries(request.query);
 
+    // part query parameter is required ...
     if (!part || part.length < 1) throw new Error("Provide the video part query parameter.");
     const partArray: VideoPartParams[] = part.split(",").map((str) => str.trim() as VideoPartParams);
 
@@ -125,6 +116,29 @@ export default function makeGetVideos({ listVideos }: { listVideos: ListVideosSe
 
       return videoResult;
     });
+  }
+
+  function limitFilterQueries(query: VideoQueryParams) {
+    // Unoptimized code ...
+
+    // const possibleFilters: string[] = ["id", "chart"];
+    // const queryKeysCount: string[] = [];
+    // Object.keys(request.query).map((queryKey) => {
+    //   const filterQueryKeyFound = possibleFilters.includes(queryKey);
+    //   if (filterQueryKeyFound) {
+    //     queryKeysCount.push(queryKey);
+    //   }
+    //   if (queryKeysCount.length > 1) {
+    //     throw new Error(`Provided more than one filter key. Please specify only one`);
+    //   }
+    // });
+
+    const possibleFilters: string[] = ["id", "chart"];
+    const queryKeysCount = Object.keys(query).filter((queryKey) => possibleFilters.includes(queryKey));
+
+    if (queryKeysCount.length > 1) {
+      throw new Error("Provided more than one filter key. Please specify only one");
+    }
   }
 }
 
