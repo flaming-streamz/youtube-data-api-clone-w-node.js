@@ -46,15 +46,7 @@ export default function makeGetVideos({ listVideos }: { listVideos: ListVideosSe
     });
 
     // Querying for Specific videos
-    let videoIds: string[] = [];
-    if (id) {
-      const ids: string[] = id.split(",").map((videoId) => videoId.trim());
-      if (ids.length > 1) {
-        videoIds = ids;
-      } else {
-        videoIds.push(id);
-      }
-    }
+    const videoIds = querySpecificVideos(id);
 
     // Pagination parameters ...
     const pageNumber = parseInt(page, 10) || 1;
@@ -139,6 +131,20 @@ export default function makeGetVideos({ listVideos }: { listVideos: ListVideosSe
     if (queryKeysCount.length > 1) {
       throw new Error("Provided more than one filter key. Please specify only one");
     }
+  }
+
+  function querySpecificVideos(id: string): string[] {
+    let videoIds: string[] = [];
+    if (id) {
+      const ids: string[] = id.split(",").map((videoId) => videoId.trim());
+      if (ids.length > 1) {
+        videoIds = ids;
+      } else {
+        videoIds.push(id);
+      }
+    }
+
+    return videoIds;
   }
 }
 
