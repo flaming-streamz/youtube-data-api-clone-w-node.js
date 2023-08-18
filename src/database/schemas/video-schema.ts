@@ -1,6 +1,7 @@
 import { Ref, modelOptions, prop } from "@typegoose/typegoose";
 import { Channel } from "./channel-schema";
 import { VideoCategory } from "./video-categories-schema";
+import { Comment } from "./comment-schema";
 
 enum UploadStatus {
   Deleted = "deleted",
@@ -77,6 +78,7 @@ class VideoStatistics {
   commentsCount?: number;
 }
 
+// TODO: Turn-off schema options _id.
 class ContentDetails {
   duration?: number;
   dimension?: string;
@@ -146,4 +148,8 @@ export class Video {
       channelTitle: "Channel Title",
     };
   }
+
+  // Virtual populate to count comments related to this video.
+  @prop({ ref: () => Comment, foreignField: "videoId", localField: "_id", justOne: false, count: true, options: {} })
+  commentsCount?: Ref<Comment>;
 }

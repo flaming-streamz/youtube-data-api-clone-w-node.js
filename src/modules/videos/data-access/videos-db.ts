@@ -48,12 +48,13 @@ export default function makeVideosDb({ database, generatePaginationCodes }: Make
 
     query = query.skip(startIndex).limit(limit);
 
+    // Populate
+    query = query.populate("commentsCount");
+
     const results = await query;
     const totalResults = await videosModel.countDocuments({ ...filterQuery });
 
-    const { numbers, tokens } = generatePaginationCodes(page);
-    console.log(numbers);
-    console.log(tokens);
+    const { tokens } = generatePaginationCodes(page);
 
     const pagination: Partial<{
       [key in "nextPageToken" | "nextPageNumber" | "prevPageToken" | "prevPageNumber"]: number | string;
