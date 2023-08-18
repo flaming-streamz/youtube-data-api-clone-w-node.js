@@ -15,16 +15,6 @@ interface VideoQueryParams {
   id: string;
 }
 
-const allowedPartParams: VideoPartParams[] = [
-  "id",
-  "snippet",
-  "status",
-  "statistics",
-  "liveStreamingDetails",
-  "fileDetails",
-  "contentDetails",
-];
-
 export default function makeGetVideos({ listVideos }: { listVideos: ListVideosServiceHandler }) {
   return async function getVideos(request: HTTPRequest<object, object, VideoQueryParams>) {
     const { part, order, maxResults, page, id } = request.query;
@@ -47,8 +37,8 @@ export default function makeGetVideos({ listVideos }: { listVideos: ListVideosSe
     const limit = parseInt(maxResults, 10) || 10;
 
     // get videos
-    type ReturnedVideoType = Partial<Video> & { _id: string; __v: string };
     const data = await listVideos({ sortBy: order || "date", limit, page: pageNumber, videoIds });
+    type ReturnedVideoType = Partial<Video> & { _id: string; __v: string };
     const videos = data.results as unknown as ReturnedVideoType[];
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -142,6 +132,15 @@ export default function makeGetVideos({ listVideos }: { listVideos: ListVideosSe
   }
 
   function checkEntriesOnPartQueryParam(partArray: VideoPartParams[]) {
+    const allowedPartParams: VideoPartParams[] = [
+      "id",
+      "snippet",
+      "status",
+      "statistics",
+      "liveStreamingDetails",
+      "fileDetails",
+      "contentDetails",
+    ];
     partArray.forEach((partStr) => {
       const isAllowed = allowedPartParams.includes(partStr);
       if (!isAllowed)
